@@ -2,19 +2,19 @@
 #define RAYLIB
 #include <bits/stdc++.h>
 #include "raylib.h"
-#endif
+#endif 
 using namespace std;
 #include "./slider.cpp"
 #include "./birds.hpp"
-#define FPS 60
-
-int total_birds = 800;
-int screenWidth = 800;
+#define FPS 10
+ 
+int total_birds = 2000;
+int screenWidth = 1000;
 int screenHeight = 800;
-float alignmentRadius = 100;
-float cohesionRadius = 100;
-float separationRadius = 100;
-
+float alignmentRadius = 50;
+float cohesionRadius = 50;
+float separationRadius = 50;
+   
 int main()
 {
     SetRandomSeed(1);
@@ -23,60 +23,27 @@ int main()
     {
         birds[i] = Bird(screenWidth, screenHeight);
     }
-
-    
+   
     InitWindow(screenWidth, screenHeight, "Flocking Birds");
-    SetTargetFPS(FPS );
+    SetTargetFPS(FPS);
     float value = 50.0f;
-    
-    Slider SeparationRadius(50,50,200,20,value, "Separation");
-    Slider CohesionRadius(50,100,200,20,value, "Cohesion");
-    Slider AlignmentRadius(50,150,200,20,value, "Alignment");
-    
+
+    Slider SeparationRadius(50, 50, 200, 20, separationRadius, "Separation");
+    Slider CohesionRadius(50, 100, 200, 20, cohesionRadius, "Cohesion");
+    Slider AlignmentRadius(50, 150, 200, 20, alignmentRadius, "Alignment");
 
     while (!WindowShouldClose())
     {
-        // if (IsKeyPressed(KEY_Q))
-        // {
-        //     separationRadius += 10;
-        //     cout << separationRadius << endl;
-        // }
-        // if (IsKeyDown(KEY_W))
-        // {
-        //     separationRadius -= 10;
-        //     cout << separationRadius << endl;
-        // }
-        // if (IsKeyDown(KEY_A))
-        // {
-        //     cohesionRadius += 10;
-        //     cout << cohesionRadius << endl;
-        // }
-        // else if (IsKeyPressed(KEY_S))
-        // {
-        //     cohesionRadius -= 10;
-        //     cout << cohesionRadius << endl;
-        // }
-        // else if (IsKeyPressed(KEY_Z))
-        // {  
-        //     alignmentRadius += 10;
-        //     cout << alignmentRadius << endl;
-        // } 
-        // else if (IsKeyPressed(KEY_X))
-        // {
-        //     alignmentRadius -= 10;
-        //     cout << alignmentRadius << endl;
-        // }
-
         for (int i = 0; i < total_birds; i++)
         {
             birds[i].alignment(birds, total_birds, alignmentRadius);
             birds[i].cohesion(birds, total_birds, cohesionRadius);
             birds[i].separation(birds, total_birds, separationRadius);
-            birds[i].setMag(30);
+            birds[i].setMag(12);
             birds[i].move(screenWidth, screenHeight);
             birds[i].drawBird();
         }
- 
+
         // Draw birds with position and velocity
         BeginDrawing();
         ClearBackground(RAYWHITE);
@@ -84,10 +51,6 @@ int main()
         AlignmentRadius.UpdateSlider(alignmentRadius);
         CohesionRadius.UpdateSlider(cohesionRadius);
         SeparationRadius.UpdateSlider(separationRadius);
-        // if (IsKeyDown(KEY_UP))
-        // {
-        //     DrawText("Upper arrow key is pressed!", 10, 10, 20, RED);
-        // }
 
         for (int i = 0; i < total_birds; i++)
         {
