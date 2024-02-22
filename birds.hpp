@@ -200,13 +200,16 @@ Vector2 Bird::cohesion(Bird *birds, int total_birds, float radius)
     acc.y += dir.y;
 
     return {dir.x, dir.y};
+    // float magVel = sqrt(dir.x * dir.x + dir.y * dir.y);
+    // acc.x += (dir.x / magVel);
+    // acc.y += (dir.y / magVel);
 }
 
 Vector2 Bird::separation(Bird *birds, int total_birds, float radius)
 {
     Vector2 dirPos = {0, 0};
     int numBirds = 0;
-    int minm = INT_MAX;
+
     for (int i = 0; i < total_birds; i++)
     {
         float d = getDist(birds[i].getPos());
@@ -223,4 +226,12 @@ Vector2 Bird::separation(Bird *birds, int total_birds, float radius)
     acc.x += dirPos.x;
     acc.y += dirPos.y;
     return dirPos;
+
+    // dir.x *= -1;
+    // dir.y *= -1;
+ 
+    // dirPos = dir;
+    // int magVel = sqrt(dirPos.x * dirPos.x + dirPos.y * dirPos.y);
+    // vel.x += dirPos.x / magVel;
+    // vel.y += dirPos.y / magVel;
 }

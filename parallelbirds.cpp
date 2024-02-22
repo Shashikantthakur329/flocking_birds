@@ -21,11 +21,17 @@ struct input
 class ParallelBird : public Bird
 {
 public:
+    ParallelBird(int screenWidth, int screenHeight);
     // void* parallel_cohesion(void *args);
     Vector2 cohesion(Bird *birds, int total_birds, float radius);
     Vector2 separation(Bird *birds, int total_birds, float radius);
     Vector2 alignment(Bird *birds, int total_birds, float radius);
 };
+
+ParallelBird::ParallelBird(int screenWidth, int screenHeight)
+    : Bird(screenWidth, screenHeight) // Call the base class (Bird) constructor
+{
+}
 
 void *parallel_cohesion(void *args)
 {
@@ -70,7 +76,6 @@ Vector2 ParallelBird::cohesion(Bird *birds, int total_birds, float radius)
     int size = total_birds / numOfThreads;
     pthread_t threads[numOfThreads];
     Vector2 *results = new Vector2[numOfThreads];
-    Vector2 ret = {0, 0};
 
     pthread_barrier_t barrier; /*  */
     pthread_barrier_init(&barrier, NULL, numOfThreads + 1);
@@ -114,10 +119,8 @@ void *parallel_separation(void *args)
     int numBirds = 0;
     Vector2 retDir = {0, 0};
     Vector2 currPos = currBird->getPos();
-
     Vector2 dirPos = {0, 0};
-    int numBirds = 0;
-    int minm = INT_MAX;
+    
     for (int i = 0; i < size; i++)
     {
         float d = currBird->getDist(birdArr[i].getPos());
@@ -149,7 +152,6 @@ Vector2 ParallelBird::separation(Bird *birds, int total_birds, float radius)
     int size = total_birds / numOfThreads;
     pthread_t threads[numOfThreads];
     Vector2 *results = new Vector2[numOfThreads];
-    Vector2 ret = {0, 0};
 
     pthread_barrier_t barrier; /*  */
     pthread_barrier_init(&barrier, NULL, numOfThreads + 1);
@@ -165,7 +167,6 @@ Vector2 ParallelBird::separation(Bird *birds, int total_birds, float radius)
         pthread_join(threads[j], NULL);
     }
 
-
     for (int j = 0; j < numOfThreads; j++)
     {
         ret.x += results[j].x;
@@ -177,8 +178,6 @@ Vector2 ParallelBird::separation(Bird *birds, int total_birds, float radius)
     this->addAcc(ret);
     return ret;
 }
-
-
 
 void *parallel_alignment(void *args)
 {
@@ -192,11 +191,7 @@ void *parallel_alignment(void *args)
 
     int numBirds = 0;
     Vector2 retDir = {0, 0};
-    Vector2 currPos = currBird->getPos();
-
-    Vector2 dirPos = {0, 0};
-    int numBirds = 0;
-    int minm = INT_MAX;
+    // Vector2 currPos = currBird->getPos();
 
     for (int i = 0; i < size; i++)
     {
@@ -227,7 +222,6 @@ Vector2 ParallelBird::alignment(Bird *birds, int total_birds, float radius)
     int size = total_birds / numOfThreads;
     pthread_t threads[numOfThreads];
     Vector2 *results = new Vector2[numOfThreads];
-    Vector2 ret = {0, 0};
 
     pthread_barrier_t barrier; /*  */
     pthread_barrier_init(&barrier, NULL, numOfThreads + 1);
@@ -236,7 +230,7 @@ Vector2 ParallelBird::alignment(Bird *birds, int total_birds, float radius)
         input inp = {birds + j * size, this, size, radius, &barrier, &results[j]};
         pthread_create(&threads[j], NULL, parallel_alignment, (void *)(&inp));
     }
-    
+
     pthread_barrier_wait(&barrier);
     for (int j = 0; j < numOfThreads; j++)
     {

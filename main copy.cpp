@@ -5,31 +5,28 @@
 #endif
 using namespace std;
 #include "./slider.cpp"
-// #include "./birds.hpp"
-#include "./parallelbirds.cpp"
-    
+#include "./birds.hpp"
 #define FPS 10
-int total_birds = 80;
+
+int total_birds = 4000;
 int screenWidth = 1000;
 int screenHeight = 800;
 float alignmentRadius = 50;
 float cohesionRadius = 50;
 float separationRadius = 50;
- 
+
 int main()
 {
     SetRandomSeed(1);
-    ParallelBird *birds = (ParallelBird*) malloc(sizeof(ParallelBird) * total_birds);
-    // Bird *birds = (Bird*) malloc(sizeof(Bird) * total_birds);
-
+    Bird *birds = (Bird *)malloc(sizeof(Bird) * total_birds);
     for (int i = 0; i < total_birds; i++)
     {
-        birds[i] = ParallelBird(screenWidth, screenHeight);
-        // birds[i] = Bird(screenWidth, screenHeight);
+        birds[i] = Bird(screenWidth, screenHeight);
     }
- 
+
     InitWindow(screenWidth, screenHeight, "Flocking Birds");
     SetTargetFPS(FPS);
+    float value = 50.0f;
    
     Slider SeparationRadius(50, 50, 200, 20, separationRadius, "Separation");
     Slider CohesionRadius(50, 100, 200, 20, cohesionRadius, "Cohesion");
@@ -46,7 +43,7 @@ int main()
             birds[i].move(screenWidth, screenHeight);
             birds[i].drawBird();
         }
- 
+
         // Draw birds with position and velocity
         BeginDrawing();
         ClearBackground(RAYWHITE);

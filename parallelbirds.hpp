@@ -1,1 +1,1 @@
-extern int numOfThreads = 20;
+extern int numOfThreads = 4;
