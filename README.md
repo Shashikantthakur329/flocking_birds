@@ -1,2 +1,2 @@
-![](./simulated_gif.gif)
+![FLOCKING BIRDS](./simulation_gif.gif)
 # hello world
