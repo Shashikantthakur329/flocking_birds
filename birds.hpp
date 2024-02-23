@@ -10,36 +10,40 @@ class Bird
 {
     Vector2 pos;
     Vector2 vel;
+    Vector2 acc;
     Color color;
     int magVel;
+    int magAcc;
 
 public:
     Bird(int width, int height);
     Vector2 getPos();
     Vector2 getVel();
-    void updateVel(int magVel);
+    void setMag(int magVel);
     float getDist(Vector2 anotherPos);
     Vector2 getDir(Vector2 anotherPos);
     void changeVel(Vector2 dir, float rate);
     // void move(int width, int height);
     void move(int screenWidth, int screenHeight);
     void drawBird();
-    Vector2 alignment(Bird *birds, int total_birds, int radius);
-    void cohesion(Bird *birds, int total_birds, int radius);
-    void separation(Bird *birds, int total_birds, int radius);
+    Vector2 alignment(Bird *birds, int total_birds, float radius);
+    Vector2 cohesion(Bird *birds, int total_birds, float radius);
+    Vector2 separation(Bird *birds, int total_birds, float radius);
+    void addAcc(Vector2 additionalAcc);
 };
 
 Bird::Bird(int screenWidth, int screenHeight)
 {
     int x = GetRandomValue(0, screenWidth - 1);
     int y = GetRandomValue(0, screenHeight - 1);
-    pos.x = x;
-    pos.y = y;
-    vel.x = GetRandomValue(-100, 100) / 1000.f;
-    vel.y = GetRandomValue(-100, 100) / 1000.f;
-    float magVel = sqrt(vel.x * vel.x + vel.y * vel.y);
-    vel.x = vel.x / magVel;
-    vel.y = vel.y / magVel;
+    this->pos.x = x;
+    this->pos.y = y;
+    this->vel.x = GetRandomValue(-100, 100) / 100.f;
+    this->vel.y = GetRandomValue(-100, 100) / 100.f;
+    this->acc.x = 0;
+    this->acc.y = 0;
+    this->magAcc = 1;
+    this->magVel = 5;
     color = (Color){0, 0, 0, 100};
 }
 
@@ -50,7 +54,11 @@ Vector2 Bird::getPos()
 
 Vector2 Bird::getVel()
 {
-    return this->vel;
+    Vector2 tempVel = this->vel;
+    float mag = sqrt(tempVel.x * tempVel.x + tempVel.y * tempVel.y);
+    tempVel.x /= mag;
+    tempVel.y /= mag;
+    return tempVel;
 }
 
 float Bird::getDist(Vector2 aPos)
@@ -62,7 +70,14 @@ float Bird::getDist(Vector2 aPos)
 
 void Bird::changeVel(Vector2 dir, float rate)
 {
-    return;
+    this->vel.x += this->acc.x;
+    this->vel.y += this->acc.y;
+}
+
+void Bird::addAcc(Vector2 anotherAcc)
+{
+    this->acc.x += anotherAcc.x;
+    this->acc.y += anotherAcc.y;
 }
 
 Vector2 Bird::getDir(Vector2 anotherPos)
@@ -79,120 +94,179 @@ Vector2 Bird::getDir(Vector2 anotherPos)
 
 void Bird::move(int screenWidth, int screenHeight)
 {
-    pos.x += vel.x;
-    pos.y += vel.y;
-    if(pos.x >= screenWidth - 50 || pos.x <= 30){
-        vel.x *= 0.9;
-        // pos.x = 200;
+    this->vel.x += this->acc.x;
+    this->vel.y += this->acc.y;
+
+    this->pos.x += this->vel.x;
+    this->pos.y += this->vel.y;
+
+    if (this->pos.y >= screenHeight - 1)
+    {
+        this->pos.y = 0;
     }
-    if(pos.y >= screenHeight - 50 || pos.y <= 30){
-        vel.y *= 0.9;
-        // pos.y = 200;
+    if (this->pos.y < 0)
+    {
+        this->pos.y = screenHeight - 2;
     }
-    if(pos.x >= screenWidth || pos.x <= 0){
-        vel.x *= -1;
-        // pos.x = 200;
+    if (this->pos.x >= screenWidth - 1)
+    {
+        this->pos.x = 0;
     }
-    if(pos.y >= screenHeight || pos.y <= 0){
-        vel.y *= -1;
-        // pos.y = 200;
+    if (this->pos.x < 0)
+    {
+        this->pos.x = screenWidth - 2;
     }
-    // if (pos.x >= screenWidth)
-    // {
-    //     pos.x = 2;
-    // }
-    // else if (pos.x <= 0)
-    // {
-    //     pos.x = screenWidth - 2;
-    // }
-    // if (pos.y >= screenHeight)
-    // {
-    //     pos.y = 2;
-    // }
-    // else if (pos.y <= 0)
-    // {
-    //     pos.y = screenHeight - 2;
-    // }
-    pos.x += 2*vel.x;
-    pos.y += 2*vel.y;
 }
 
-void Bird::updateVel(int magVel)
+void Bird::setMag(int magVels)
 {
-    vel.x *= magVel;
-    vel.y *= magVel;
+    float mag = sqrt(this->vel.x * this->vel.x + this->vel.y * this->vel.y);
+    if (mag >= magVel)
+    {
+        this->vel.x = this->vel.x / mag;
+        this->vel.y = this->vel.y / mag;
+        this->vel.x *= magVels;
+        this->vel.y *= magVels;
+    }
+
+    float macc = sqrt(acc.x * acc.x + acc.y * acc.y);
+    if (macc < this->magAcc)
+    {
+        return;
+    }
+    this->acc.x = this->acc.x / macc;
+    this->acc.y = this->acc.y / macc;
+
     return;
+}
+
+void drawTriangle(int d, Vector2 center, Vector2 dir)
+{
+    // y1 = d*sin(theta) + y;
+    // x1 = d*cos(theta) + x;
+
+    double theta = PI / 2;
+    if (dir.x != 0.0f)
+    {
+        double tanTheta = abs(dir.y) / abs(dir.x);
+        theta = atan(tanTheta);
+        if (dir.x < 0.0f)
+        {
+            if (dir.y > 0.0f)
+            {
+                theta = PI - theta;
+            }
+            if (dir.y < 0.0f)
+            {
+                theta = theta + PI;
+            }
+        }
+        else if (dir.x > 0.0f)
+        {
+            if (dir.y < 0.0f)
+            {
+                theta = 2 * PI - theta;
+            }
+        }
+    }
+
+    Vector2 pos1, pos2, pos3;
+    pos1.x = (center.x + (d * 2) * (cos(theta)));
+    pos1.y = (center.y + (d * 2) * (sin(theta)));
+
+    pos2.x = (center.x + d * (cos(theta + (2 * PI / 3))));
+    pos2.y = (center.y + d * (sin(theta + (2 * PI / 3))));
+
+    pos3.x = (center.x + d * (cos(theta + (4 * PI / 3))));
+    pos3.y = (center.y + d * (sin(theta + (4 * PI / 3))));
+
+    // cout << center.x << " " << center.y << " " << dir.x << " " << dir.y << " " << theta << " " << pos1.x << " " << pos1.y << " " << pos2.x << " " << pos2.y << " " << pos3.x << " " << pos3.y << endl;
+    DrawTriangle(pos3, pos2, pos1, Color({0,0,0,100}));
 }
 
 void Bird::drawBird()
 {
-    DrawCircle(pos.x, pos.y, 3, color);
-    // DrawPixelV(pos, color);
+    Vector2 dir = this->getVel();
+    drawTriangle(6, this->pos, dir);
 }
 
-Vector2 Bird::alignment(Bird *birds, int total_birds, int radius)
+Vector2 Bird::alignment(Bird *birds, int total_birds, float radius)
 {
     Vector2 retDir = {0, 0};
     int birdCount = 0;
     for (int i = 0; i < total_birds; i++)
     {
         float dist = getDist(birds[i].getPos());
-        if (dist <= radius)
+        if (dist > 0.01 && dist <= radius)
         {
             birdCount++;
             retDir.x += birds[i].getVel().x;
             retDir.y += birds[i].getVel().y;
         }
     }
-    float magntDir = sqrt(retDir.x * retDir.x + retDir.y * retDir.y);
-    retDir.x = retDir.x / magntDir;
-    retDir.y = retDir.y / magntDir;
 
-    // velocity badh rhi hai har baar
-    vel.x += retDir.x;
-    vel.y += retDir.y;
+    if (birdCount > 0)
+    {
+        retDir.x /= birdCount;
+        retDir.y /= birdCount;
+    }
 
-    float magVel = sqrt(vel.x * vel.x + vel.y * vel.y);
-    vel.x = vel.x / magVel;
-    vel.y = vel.y / magVel;
+    acc.x += retDir.x;
+    acc.x += retDir.y;
+
     return retDir;
 }
 
-void Bird::cohesion(Bird *birds, int total_birds, int radius)
+Vector2 Bird::cohesion(Bird *birds, int total_birds, float radius)
 {
     Vector2 dirPos = {0, 0};
     int numBirds = 0;
     for (int i = 0; i < total_birds; i++)
     {
-        if (getDist(birds[i].getPos()) <= radius)
+        float dist = getDist(birds[i].getPos());
+        if (dist != 0 && dist <= radius)
         {
             numBirds++;
-            dirPos.x = dirPos.x + birds[i].getPos().x;
-            dirPos.y = dirPos.y + birds[i].getPos().y;
+            dirPos.x += (birds[i].getPos().x - pos.x);
+            dirPos.y += (birds[i].getPos().y - pos.y);
         }
     }
 
-    int magVel = sqrt(dirPos.x * dirPos.x + dirPos.y * dirPos.y);
-    vel.x += dirPos.x / magVel;
-    vel.y += dirPos.y / magVel;
+    Vector2 dir;
+    if (numBirds > 0)
+    {
+        dir.x = dirPos.x / numBirds;
+        dir.y = dirPos.y / numBirds;
+    }
+
+    acc.x += dir.x;
+    acc.y += dir.y;
+
+    return {dir.x, dir.y};
+    // float magVel = sqrt(dir.x * dir.x + dir.y * dir.y);
+    // acc.x += (dir.x / magVel);
+    // acc.y += (dir.y / magVel);
 }
 
-void Bird::separation(Bird *birds, int total_birds, int radius)
+Vector2 Bird::separation(Bird *birds, int total_birds, float radius)
 {
     Vector2 dirPos = {0, 0};
     int numBirds = 0;
+
     for (int i = 0; i < total_birds; i++)
     {
-        if (getDist(birds[i].getPos()) <= radius)
+        float d = getDist(birds[i].getPos());
+        if (d != 0 && d <= radius)
         {
             numBirds++;
-            dirPos.x = dirPos.x + birds[i].getPos().x;
-            dirPos.y = dirPos.y + birds[i].getPos().y;
+            dirPos.x += (pos.x - birds[i].getPos().x);
+            dirPos.y += (pos.y - birds[i].getPos().y);
+            dirPos.x /= (d * d);
+            dirPos.y /= (d * d);
         }
     }
-    dirPos.x *= -1;
-    dirPos.y *= -1;
-    int magVel = sqrt(dirPos.x * dirPos.x + dirPos.y * dirPos.y);
-    vel.x += dirPos.x / magVel;
-    vel.y += dirPos.y / magVel;
+
+    acc.x += dirPos.x;
+    acc.y += dirPos.y;
+    return dirPos;
 }
