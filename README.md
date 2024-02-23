@@ -1,2 +1,2 @@
-![FLOCKING BIRDS](./simulation_gif.gif){style="display: block; margin: 0 auto" }
+![FLOCKING BIRDS](./simulation_gif.gif#center)
 # hello world
