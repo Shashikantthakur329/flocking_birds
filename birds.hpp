@@ -40,12 +40,10 @@ Bird::Bird(int screenWidth, int screenHeight)
     this->pos.y = y;
     this->vel.x = GetRandomValue(-100, 100) / 100.f;
     this->vel.y = GetRandomValue(-100, 100) / 100.f;
-    // cout << this->pos.x << " " << this->pos.y << endl;
-    // cout << this->vel.x << " " << this->vel.y << endl;
     this->acc.x = 0;
     this->acc.y = 0;
-    this->magAcc = 3;
-    this->magVel = 6;
+    this->magAcc = 1;
+    this->magVel = 5;
     color = (Color){0, 0, 0, 100};
 }
 
@@ -96,25 +94,20 @@ Vector2 Bird::getDir(Vector2 anotherPos)
 
 void Bird::move(int screenWidth, int screenHeight)
 {
-
     this->vel.x += this->acc.x;
     this->vel.y += this->acc.y;
 
     this->pos.x += this->vel.x;
     this->pos.y += this->vel.y;
 
-    // cout<<this -> pos.x << " " << this -> pos.y <<" "<< this -> vel.x << " " << this -> vel.y<<endl;
-    // cout<<this -> acc.x << " "<<this -> acc.y<<endl;
     if (this->pos.y >= screenHeight - 1)
     {
         this->pos.y = 0;
     }
-
     if (this->pos.y < 0)
     {
         this->pos.y = screenHeight - 2;
     }
-
     if (this->pos.x >= screenWidth - 1)
     {
         this->pos.x = 0;
@@ -153,14 +146,33 @@ void drawTriangle(int d, Vector2 center, Vector2 dir)
     // x1 = d*cos(theta) + x;
 
     double theta = PI / 2;
-    if (dir.x != center.x)
+    if (dir.x != 0.0f)
     {
-        double tanTheta = (dir.y - center.y) / (dir.x - center.x);
+        double tanTheta = abs(dir.y) / abs(dir.x);
         theta = atan(tanTheta);
+        if (dir.x < 0.0f)
+        {
+            if (dir.y > 0.0f)
+            {
+                theta = PI - theta;
+            }
+            if (dir.y < 0.0f)
+            {
+                theta = theta + PI;
+            }
+        }
+        else if (dir.x > 0.0f)
+        {
+            if (dir.y < 0.0f)
+            {
+                theta = 2 * PI - theta;
+            }
+        }
     }
+
     Vector2 pos1, pos2, pos3;
-    pos1.x = (center.x + (d * 1.5) * (cos(theta)));
-    pos1.y = (center.y + (d * 1.5) * (sin(theta)));
+    pos1.x = (center.x + (d * 2) * (cos(theta)));
+    pos1.y = (center.y + (d * 2) * (sin(theta)));
 
     pos2.x = (center.x + d * (cos(theta + (2 * PI / 3))));
     pos2.y = (center.y + d * (sin(theta + (2 * PI / 3))));
@@ -168,16 +180,14 @@ void drawTriangle(int d, Vector2 center, Vector2 dir)
     pos3.x = (center.x + d * (cos(theta + (4 * PI / 3))));
     pos3.y = (center.y + d * (sin(theta + (4 * PI / 3))));
 
-    // cout << center.x << " " << center.y << " " << theta << " " << pos1.x << " " << pos1.y << " " << pos2.x << " " << pos2.y << " " << pos3.x << " " << pos3.y << endl;
-    DrawTriangle(pos3, pos2, pos1, RED);
+    // cout << center.x << " " << center.y << " " << dir.x << " " << dir.y << " " << theta << " " << pos1.x << " " << pos1.y << " " << pos2.x << " " << pos2.y << " " << pos3.x << " " << pos3.y << endl;
+    DrawTriangle(pos3, pos2, pos1, Color({0,0,0,100}));
 }
 
 void Bird::drawBird()
 {
-    // DrawPixel(pos.x, pos.y, color);
-    // DrawCircle(pos.x, pos.y, 2, color);
     Vector2 dir = this->getVel();
-    drawTriangle(10, this->pos, dir);
+    drawTriangle(6, this->pos, dir);
 }
 
 Vector2 Bird::alignment(Bird *birds, int total_birds, float radius)
@@ -255,16 +265,8 @@ Vector2 Bird::separation(Bird *birds, int total_birds, float radius)
             dirPos.y /= (d * d);
         }
     }
-    // Vector2 dir;
+
     acc.x += dirPos.x;
     acc.y += dirPos.y;
     return dirPos;
-
-    // dir.x *= -1;
-    // dir.y *= -1;
-
-    // dirPos = dir;
-    // int magVel = sqrt(dirPos.x * dirPos.x + dirPos.y * dirPos.y);
-    // vel.x += dirPos.x / magVel;
-    // vel.y += dirPos.y / magVel;
 }
