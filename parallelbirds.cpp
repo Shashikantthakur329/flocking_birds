@@ -64,7 +64,7 @@ void *parallel_cohesion(void *args)
         retDir.y = retDir.y / numBirds;
     }
 
-    pthread_barrier_wait(barrier);
+    // pthread_barrier_wait(barrier);
     *res = retDir;
     // currBird->addAcc(retDir);
     return res;
@@ -86,7 +86,7 @@ Vector2 ParallelBird::cohesion(Bird *birds, int total_birds, float radius)
     }
 
     // Wait for all threads to reach the barrier before continuing
-    pthread_barrier_wait(&barrier);
+    // pthread_barrier_wait(&barrier);
 
     // Join threads after they finish
     for (int j = 0; j < numOfThreads; j++)
@@ -140,7 +140,7 @@ void *parallel_separation(void *args)
     //     retDir.y = retDir.y / numBirds;
     // }
 
-    pthread_barrier_wait(barrier);
+    // pthread_barrier_wait(barrier);
     *res = retDir;
     // currBird->addAcc(retDir);
     return res;
@@ -161,7 +161,7 @@ Vector2 ParallelBird::separation(Bird *birds, int total_birds, float radius)
         pthread_create(&threads[j], NULL, parallel_separation, (void *)(&inp));
     }
 
-    pthread_barrier_wait(&barrier);
+    // pthread_barrier_wait(&barrier);
     for (int j = 0; j < numOfThreads; j++)
     {
         pthread_join(threads[j], NULL);
@@ -210,7 +210,7 @@ void *parallel_alignment(void *args)
         retDir.y /= numBirds;
     }
 
-    pthread_barrier_wait(barrier);
+    // pthread_barrier_wait(barrier);
     *res = retDir;
     // currBird->addAcc(retDir);
     return res;
@@ -231,7 +231,7 @@ Vector2 ParallelBird::alignment(Bird *birds, int total_birds, float radius)
         pthread_create(&threads[j], NULL, parallel_alignment, (void *)(&inp));
     }
 
-    pthread_barrier_wait(&barrier);
+    // pthread_barrier_wait(&barrier);
     for (int j = 0; j < numOfThreads; j++)
     {
         pthread_join(threads[j], NULL);
@@ -244,7 +244,7 @@ Vector2 ParallelBird::alignment(Bird *birds, int total_birds, float radius)
     }
 
     // Destroy the barrier
-    pthread_barrier_destroy(&barrier);
+    // pthread_barrier_destroy(&barrier);
     this->addAcc(ret);
     return ret;
 }

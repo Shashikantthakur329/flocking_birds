@@ -10,10 +10,10 @@ raylibPath = /usr/local/lib/libraylib.a
 all: $(name) $(dep)
 
 $(name): $(objName) $(raylibPath)
-	$(CXX) -Wall -pg -o $(name) $(objName) $(raylibPath)
+	$(CXX) -pg -o $(name) $(objName) $(raylibPath)
 
 $(objName): $(inputName)
-	$(CXX) -Wall -pg -c $(inputName)
+	$(CXX) -pg -c $(inputName)
 
 $(gprofOut): $(gprof)
 	gprof $(name) $(gprof) > $(gprofOut)

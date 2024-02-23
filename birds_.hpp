@@ -56,11 +56,7 @@ Vector2 Bird::getPos()
 
 Vector2 Bird::getVel()
 {
-    Vector2 tempVel = this->vel;
-    float mag = sqrt(tempVel.x * tempVel.x + tempVel.y * tempVel.y);
-    tempVel.x /= mag;
-    tempVel.y /= mag;
-    return tempVel;
+    return this->vel;
 }
 
 float Bird::getDist(Vector2 aPos)
@@ -72,14 +68,13 @@ float Bird::getDist(Vector2 aPos)
 
 void Bird::changeVel(Vector2 dir, float rate)
 {
-    this->vel.x += this->acc.x;
-    this->vel.y += this->acc.y;
+    this -> vel.x += this -> acc.x;
+    this -> vel.y += this -> acc.y;
 }
 
-void Bird::addAcc(Vector2 anotherAcc)
-{
-    this->acc.x += anotherAcc.x;
-    this->acc.y += anotherAcc.y;
+void Bird::addAcc(Vector2 anotherAcc){
+    this -> acc.x += anotherAcc.x;
+    this -> acc.y += anotherAcc.y;
 }
 
 Vector2 Bird::getDir(Vector2 anotherPos)
@@ -102,19 +97,18 @@ void Bird::move(int screenWidth, int screenHeight)
 
     this->pos.x += this->vel.x;
     this->pos.y += this->vel.y;
-
+    
     // cout<<this -> pos.x << " " << this -> pos.y <<" "<< this -> vel.x << " " << this -> vel.y<<endl;
     // cout<<this -> acc.x << " "<<this -> acc.y<<endl;
     if (this->pos.y >= screenHeight - 1)
     {
         this->pos.y = 0;
     }
-
     if (this->pos.y < 0)
     {
         this->pos.y = screenHeight - 2;
     }
-
+    
     if (this->pos.x >= screenWidth - 1)
     {
         this->pos.x = 0;
@@ -137,47 +131,46 @@ void Bird::setMag(int magVels)
     }
 
     float macc = sqrt(acc.x * acc.x + acc.y * acc.y);
-    if (macc < this->magAcc)
+    if (macc < this -> magAcc)
     {
         return;
     }
-    this->acc.x = this->acc.x / macc;
-    this->acc.y = this->acc.y / macc;
+    this -> acc.x = this -> acc.x / macc;
+    this -> acc.y = this -> acc.y / macc;
 
     return;
 }
 
-void drawTriangle(int d, Vector2 center, Vector2 dir)
-{
+#define PI 3.14159265
+void drawTriangle(int d, Vector2 center, Vector2 dir){
     // y1 = d*sin(theta) + y;
     // x1 = d*cos(theta) + x;
-
-    double theta = PI / 2;
-    if (dir.x != center.x)
-    {
-        double tanTheta = (dir.y - center.y) / (dir.x - center.x);
+ 
+    double theta = PI/2;
+    if(dir.x != center.x){
+        double tanTheta = (dir.y - center.y)/(dir.x - center.x);
         theta = atan(tanTheta);
     }
     Vector2 pos1, pos2, pos3;
-    pos1.x = (center.x + (d * 1.5) * (cos(theta)));
-    pos1.y = (center.y + (d * 1.5) * (sin(theta)));
+    pos1.x = (dir.x + d * (cos(theta)));
+    pos1.y = (dir.y + d* (sin(theta)));
 
-    pos2.x = (center.x + d * (cos(theta + (2 * PI / 3))));
-    pos2.y = (center.y + d * (sin(theta + (2 * PI / 3))));
+    pos2.x = (dir.x + d*(cos(theta + (2*PI/3))));
+    pos2.y = (dir.y + d*(sin(theta + (2*PI/3))));
 
-    pos3.x = (center.x + d * (cos(theta + (4 * PI / 3))));
-    pos3.y = (center.y + d * (sin(theta + (4 * PI / 3))));
+    pos3.x = (dir.x + d*(cos(theta + (4*PI/3))));
+    pos3.y = (dir.y + d*(sin(theta + (4*PI/3))));
 
-    // cout << center.x << " " << center.y << " " << theta << " " << pos1.x << " " << pos1.y << " " << pos2.x << " " << pos2.y << " " << pos3.x << " " << pos3.y << endl;
-    DrawTriangle(pos3, pos2, pos1, RED);
+    DrawTriangle(pos1, pos2, pos3, RED);
 }
 
 void Bird::drawBird()
 {
     // DrawPixel(pos.x, pos.y, color);
     // DrawCircle(pos.x, pos.y, 2, color);
-    Vector2 dir = this->getVel();
-    drawTriangle(10, this->pos, dir);
+    Vector2 dir = this -> getVel();
+    DrawTriangle({0,0}, {10, 10}, {20,20}, RED);
+    // drawTriangle(5, this -> pos, dir);
 }
 
 Vector2 Bird::alignment(Bird *birds, int total_birds, float radius)
@@ -214,7 +207,7 @@ Vector2 Bird::cohesion(Bird *birds, int total_birds, float radius)
     for (int i = 0; i < total_birds; i++)
     {
         float dist = getDist(birds[i].getPos());
-        if (dist != 0 && dist <= radius)
+        if ( dist != 0 && dist <= radius)
         {
             numBirds++;
             dirPos.x += (birds[i].getPos().x - pos.x);
@@ -262,7 +255,7 @@ Vector2 Bird::separation(Bird *birds, int total_birds, float radius)
 
     // dir.x *= -1;
     // dir.y *= -1;
-
+ 
     // dirPos = dir;
     // int magVel = sqrt(dirPos.x * dirPos.x + dirPos.y * dirPos.y);
     // vel.x += dirPos.x / magVel;

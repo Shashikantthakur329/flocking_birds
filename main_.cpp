@@ -7,10 +7,10 @@ using namespace std;
 #include "./slider.cpp"
 // #include "./birds.hpp"
 #include "./parallelbirds.cpp"
-
-#define FPS 40  
-int total_birds = 40;
-int screenWidth = 1000; 
+ 
+#define FPS 30
+int total_birds = 1;
+int screenWidth = 1000;
 int screenHeight = 800;
 float alignmentRadius = 50;
 float cohesionRadius = 50;
@@ -20,17 +20,17 @@ int main()
 {
     SetRandomSeed(1);
     // ParallelBird *birds = (ParallelBird*) malloc(sizeof(ParallelBird) * total_birds);
-    Bird *birds = (Bird *)malloc(sizeof(Bird) * total_birds);
+    Bird *birds = (Bird*) malloc(sizeof(Bird) * total_birds);
 
     for (int i = 0; i < total_birds; i++)
     {
         // birds[i] = ParallelBird(screenWidth, screenHeight);
         birds[i] = Bird(screenWidth, screenHeight);
     }
-
+  
     InitWindow(screenWidth, screenHeight, "Flocking Birds");
     SetTargetFPS(FPS);
-
+   
     Slider SeparationRadius(50, 50, 200, 20, separationRadius, "Separation");
     Slider CohesionRadius(50, 100, 200, 20, cohesionRadius, "Cohesion");
     Slider AlignmentRadius(50, 150, 200, 20, alignmentRadius, "Alignment");
@@ -46,6 +46,7 @@ int main()
             birds[i].move(screenWidth, screenHeight);
             birds[i].drawBird();
         }
+        int temp = 1;
         // Draw birds with position and velocity
         BeginDrawing();
         ClearBackground(RAYWHITE);
@@ -53,14 +54,12 @@ int main()
         AlignmentRadius.UpdateSlider(alignmentRadius);
         CohesionRadius.UpdateSlider(cohesionRadius);
         SeparationRadius.UpdateSlider(separationRadius);
-        // DrawTriangleLines({400, 400}, {400, 450}, {300, 600}, RED);
-        // DrawCircle(100, 100, 50, RED);
 
-        for (int i = 0; i < total_birds; i++)
-        {
-            birds[i].drawBird();
-        }
-        // birds[0].drawBird();
+        // for (int i = 0; i < total_birds; i++)
+        // {
+        //     birds[i].drawBird();
+        // } 
+        birds[0].drawBird();
         EndDrawing();
     }
 
